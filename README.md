@@ -10,6 +10,8 @@ yarn add unmount-animation-clone
 
 ## Usage
 
+[Live Demo](https://codesandbox.io/s/unmount-animation-clone-ich71)
+
 **Style**
 
 ```css
@@ -39,6 +41,7 @@ yarn add unmount-animation-clone
 }
 
 .animated-element.unmount {
+  /* Unmount animation is required. */
   animation-name: animation-leave;
 }
 ```
@@ -46,7 +49,7 @@ yarn add unmount-animation-clone
 **Render**
 
 ```jsx
-import {useState} from 'react';
+import {useEffect, useState} from 'react';
 import {UnmountAnimationClone} from 'unmount-animation-clone';
 
 function App() {
@@ -58,15 +61,25 @@ function App() {
     return () => clearTimeout(timer);
   }, [shown]);
 
-  return (
-    shown && (
-      <UnmountAnimationClone>
-        <div className="animated-element">hello, world!</div>
-      </UnmountAnimationClone>
-    )
+  return shown ? (
+    <UnmountAnimationClone>
+      <div className="animated-element">hello, world!</div>
+    </UnmountAnimationClone>
+  ) : (
+    <></>
   );
 }
 ```
+
+## API References
+
+### `UnmountAnimationClone`
+
+- `className` class name adds to the DOM element clone for unmount animation, defaults to `unmount`.
+
+> `UnmountAnimationClone` requires one and only one React element as child. If the child is not a DOM element, make sure `forwardRef` is used to forward the ref to the outermost DOM element.
+
+> `UnmountAnimationClone` relies on `animationend` event to remove the animated clone, so unmount animation is required.
 
 ## License
 
