@@ -1,6 +1,6 @@
 {
   "name": "unmount-animation-clone",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "description": "A simple utility component that clones the DOM element for animation before it unmounts.",
   "license": "MIT",
   "author": "vilicvane",
