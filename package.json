@@ -8,8 +8,7 @@
   "types": "bld/library/index.d.ts",
   "files": [
     "src/library/**/*.ts",
-    "bld/library",
-    "!*.tsbuildinfo"
+    "bld/library/**/*.{js,js.map,d.ts}"
   ],
   "scripts": {
     "build": "rimraf ./bld && tsc --build",
