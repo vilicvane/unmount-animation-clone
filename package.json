@@ -6,20 +6,27 @@
   "author": "vilicvane",
   "main": "bld/library/index.js",
   "types": "bld/library/index.d.ts",
+  "files": [
+    "src/library/**/*.ts",
+    "bld/library",
+    "!*.tsbuildinfo"
+  ],
   "scripts": {
     "build": "rimraf ./bld && tsc --build",
     "lint": "eslint .",
     "lint-prettier": "prettier --check .",
     "test": "yarn lint-prettier && yarn build && yarn lint"
   },
-  "dependencies": {
-    "tslib": "^2.3.1"
+  "peerDependencies": {
+    "react": "^17.0.2"
   },
   "devDependencies": {
     "@mufan/code": "^0.2.9",
     "@mufan/eslint-plugin": "^0.1.41",
+    "@types/react": "^17.0.27",
     "eslint": "^7.32.0",
     "prettier": "^2.4.1",
+    "react": "^17.0.2",
     "rimraf": "^3.0.2",
     "typescript": "^4.4.3"
   }
