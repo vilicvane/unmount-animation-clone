@@ -17,5 +17,11 @@
     "typescript",
     "typescriptreact"
   ],
-  "cSpell.words": ["boilerplates", "mufan", "tsbuildinfo", "vilicvane"]
+  "cSpell.words": [
+    "boilerplates",
+    "keyframes",
+    "mufan",
+    "tsbuildinfo",
+    "vilicvane"
+  ]
 }
