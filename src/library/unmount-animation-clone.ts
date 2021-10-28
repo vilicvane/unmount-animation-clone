@@ -1,4 +1,6 @@
+import composeRefs from '@seznam/compose-react-refs';
 import {
+  CSSProperties,
   Children,
   FunctionComponent,
   cloneElement,
@@ -13,12 +15,30 @@ export interface UnmountAnimationCloneProps {
    * Class name that adds to the DOM element clone for unmount animation.
    */
   className?: string;
+  /**
+   * Style that adds to the DOM element clone for unmount animation.
+   */
+  style?: CSSProperties;
+  transitionClassName?: string;
+  transitionStyle?: CSSProperties;
+  /**
+   * Do not remove the DOM element clone after animation (might be useful for
+   * debugging).
+   */
+  persist?: boolean;
 }
 
 export const UnmountAnimationClone: FunctionComponent<UnmountAnimationCloneProps> =
-  ({className = 'unmount', children}) => {
+  ({
+    className = 'unmount',
+    style,
+    transitionStyle,
+    transitionClassName,
+    persist,
+    children,
+  }) => {
     // eslint-disable-next-line no-null/no-null
-    let ref = useRef<HTMLDivElement>(null);
+    let ref = useRef<HTMLElement>(null);
 
     useLayoutEffect(() => {
       return () => {
@@ -27,13 +47,41 @@ export const UnmountAnimationClone: FunctionComponent<UnmountAnimationCloneProps
         // eslint-disable-next-line @mufan/no-unnecessary-type-assertion
         let parent = origin.parentElement!;
 
-        let clone = origin.cloneNode(true) as HTMLDivElement;
+        let clone = origin.cloneNode(true) as HTMLElement;
 
         clone.classList.add(className);
 
+        if (style) {
+          assignStyle(clone, style);
+        }
+
         parent.insertBefore(clone, origin);
 
-        clone.addEventListener('animationend', () => clone.remove());
+        if (transitionClassName || transitionStyle) {
+          // reflow
+          void clone.offsetHeight;
+
+          if (transitionClassName) {
+            clone.classList.add(transitionClassName);
+          }
+
+          if (transitionStyle) {
+            assignStyle(clone, transitionStyle);
+          }
+        }
+
+        if (!persist) {
+          clone.addEventListener('animationend', onEnd);
+          clone.addEventListener('transitionend', onEnd);
+        }
+
+        function onEnd(event: Event): void {
+          if (event.target !== clone) {
+            return;
+          }
+
+          clone.remove();
+        }
       };
       // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
@@ -56,5 +104,17 @@ export const UnmountAnimationClone: FunctionComponent<UnmountAnimationCloneProps
       throw new Error('Expecting a React element');
     }
 
-    return cloneElement(child, {ref});
+    return cloneElement(child, {ref: composeRefs((child as any).ref, ref)});
   };
+
+function assignStyle(target: HTMLElement, styleProps: CSSProperties): void {
+  let style = target.style;
+
+  for (let [key, value] of Object.entries(styleProps)) {
+    if (key.includes('-')) {
+      style.setProperty(key, value);
+    } else {
+      (style as any)[key] = value;
+    }
+  }
+}

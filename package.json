@@ -16,6 +16,9 @@
     "lint-prettier": "prettier --check .",
     "test": "yarn lint-prettier && yarn build && yarn lint"
   },
+  "dependencies": {
+    "@seznam/compose-react-refs": "^1.0.6"
+  },
   "peerDependencies": {
     "react": "^17.0.2"
   },
