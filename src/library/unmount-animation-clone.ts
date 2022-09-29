@@ -1,9 +1,7 @@
 import composeRefs from '@seznam/compose-react-refs';
+import type {CSSProperties, FunctionComponent, ReactElement} from 'react';
 import {
-  CSSProperties,
   Children,
-  FunctionComponent,
-  ReactElement,
   cloneElement,
   isValidElement,
   useEffect,
@@ -32,95 +30,98 @@ export interface UnmountAnimationCloneProps {
   children: ReactElement;
 }
 
-export const UnmountAnimationClone: FunctionComponent<UnmountAnimationCloneProps> =
-  ({
-    className = 'unmount',
-    style,
-    transitionStyle,
-    transitionClassName,
-    persist,
-    onUnmountClone,
-    onUnmountRemove,
-    children,
-  }) => {
-    // eslint-disable-next-line no-null/no-null
-    let ref = useRef<HTMLElement>(null);
+export const UnmountAnimationClone: FunctionComponent<
+  UnmountAnimationCloneProps
+> = ({
+  className = 'unmount',
+  style,
+  transitionStyle,
+  transitionClassName,
+  persist,
+  onUnmountClone,
+  onUnmountRemove,
+  children,
+}) => {
+  // eslint-disable-next-line no-null/no-null
+  const ref = useRef<HTMLElement>(null);
 
-    useLayoutEffect(() => {
-      return () => {
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-        let origin = ref.current!;
-        // eslint-disable-next-line @mufan/no-unnecessary-type-assertion
-        let parent = origin.parentElement!;
-
-        let clone = origin.cloneNode(true) as HTMLElement;
-
-        clone.classList.add(className);
-
-        if (style) {
-          assignStyle(clone, style);
-        }
-
-        parent.insertBefore(clone, origin);
-
-        onUnmountClone?.(clone);
-
-        if (transitionClassName || transitionStyle) {
-          // reflow
-          void clone.offsetHeight;
-
-          if (transitionClassName) {
-            clone.classList.add(transitionClassName);
-          }
-
-          if (transitionStyle) {
-            assignStyle(clone, transitionStyle);
-          }
-        }
-
-        if (!persist) {
-          clone.addEventListener('animationend', onEnd);
-          clone.addEventListener('transitionend', onEnd);
-        }
-
-        function onEnd(event: Event): void {
-          if (event.target !== clone) {
-            return;
-          }
-
-          clone.remove();
-
-          onUnmountRemove?.();
-        }
-      };
+  useLayoutEffect(() => {
+    return () => {
       // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, []);
+      const origin = ref.current!;
+      const parent = origin.parentElement!;
 
-    let renderCountRef = useRef(0);
+      const clone = origin.cloneNode(true) as HTMLElement;
 
-    useEffect(() => {
-      renderCountRef.current++;
+      clone.classList.add(className);
 
-      if (renderCountRef.current > 1) {
-        throw new Error(
-          'Property `className` of `UnmountAnimationClone` must not mutate during the lifecycle',
-        );
+      if (style) {
+        assignStyle(clone, style);
       }
-    }, [className]);
 
-    let child = Children.only(children);
+      parent.insertBefore(clone, origin);
 
-    if (!isValidElement(child)) {
-      throw new Error('Expecting a React element');
+      onUnmountClone?.(clone);
+
+      if (transitionClassName || transitionStyle) {
+        // reflow
+        void clone.offsetHeight;
+
+        if (transitionClassName) {
+          clone.classList.add(transitionClassName);
+        }
+
+        if (transitionStyle) {
+          assignStyle(clone, transitionStyle);
+        }
+      }
+
+      if (!persist) {
+        clone.addEventListener('animationend', onEnd);
+        clone.addEventListener('transitionend', onEnd);
+      }
+
+      function onEnd(event: Event): void {
+        if (event.target !== clone) {
+          return;
+        }
+
+        clone.remove();
+
+        onUnmountRemove?.();
+      }
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  const renderCountRef = useRef(0);
+
+  useEffect(() => {
+    renderCountRef.current++;
+
+    if (renderCountRef.current > 1) {
+      throw new Error(
+        'Property `className` of `UnmountAnimationClone` must not mutate during the lifecycle',
+      );
     }
+  }, [className]);
 
-    return cloneElement(child, {ref: composeRefs((child as any).ref, ref)});
-  };
+  const child = Children.only(children);
+
+  if (!isValidElement(child)) {
+    throw new Error('Expecting a React element');
+  }
+
+  // eslint-disable-next-line @mufan/no-object-literal-type-assertion
+  return cloneElement(child, {
+    ref: composeRefs((child as any).ref, ref),
+  } as object);
+};
 
 function assignStyle(target: HTMLElement, styleProps: CSSProperties): void {
-  let style = target.style;
+  const style = target.style;
 
-  for (let [key, value] of Object.entries(styleProps)) {
+  for (const [key, value] of Object.entries(styleProps)) {
     if (key.includes('-')) {
       style.setProperty(key, value);
     } else {
