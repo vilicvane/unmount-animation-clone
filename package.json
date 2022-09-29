@@ -4,23 +4,26 @@
   "description": "A simple utility component that clones the DOM element for animation before it unmounts.",
   "license": "MIT",
   "author": "vilicvane",
-  "main": "bld/library/index.js",
-  "types": "bld/library/index.d.ts",
+  "exports": {
+    "types": "./bld/library/index.d.ts",
+    "require": "./bld/library/index.js"
+  },
   "scripts": {
     "build": "rimraf ./bld && tsc --build",
-    "lint": "eslint .",
+    "lint": "run-in-every eslint-project --parallel --echo -- eslint --config {configFileName} --no-error-on-unmatched-pattern .",
     "lint-prettier": "prettier --check .",
     "test": "yarn lint-prettier && yarn build && yarn lint"
   },
   "dependencies": {
-    "tslib": "^2.3.1"
+    "tslib": "^2.4.0"
   },
   "devDependencies": {
-    "@mufan/code": "^0.2.9",
-    "@mufan/eslint-plugin": "^0.1.41",
-    "eslint": "^7.32.0",
-    "prettier": "^2.4.1",
+    "@mufan/code": "^0.2.15",
+    "@mufan/eslint-plugin": "^0.1.75",
+    "eslint": "^8.24.0",
+    "prettier": "^2.7.1",
     "rimraf": "^3.0.2",
-    "typescript": "^4.4.3"
+    "run-in-every": "^0.2.0",
+    "typescript": "^4.8.4"
   }
 }
