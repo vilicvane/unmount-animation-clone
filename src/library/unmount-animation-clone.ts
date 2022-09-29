@@ -3,6 +3,7 @@ import {
   CSSProperties,
   Children,
   FunctionComponent,
+  ReactElement,
   cloneElement,
   isValidElement,
   useEffect,
@@ -26,6 +27,9 @@ export interface UnmountAnimationCloneProps {
    * debugging).
    */
   persist?: boolean;
+  onUnmountClone?(clone: HTMLElement): void;
+  onUnmountRemove?(): void;
+  children: ReactElement;
 }
 
 export const UnmountAnimationClone: FunctionComponent<UnmountAnimationCloneProps> =
@@ -35,6 +39,8 @@ export const UnmountAnimationClone: FunctionComponent<UnmountAnimationCloneProps
     transitionStyle,
     transitionClassName,
     persist,
+    onUnmountClone,
+    onUnmountRemove,
     children,
   }) => {
     // eslint-disable-next-line no-null/no-null
@@ -56,6 +62,8 @@ export const UnmountAnimationClone: FunctionComponent<UnmountAnimationCloneProps
         }
 
         parent.insertBefore(clone, origin);
+
+        onUnmountClone?.(clone);
 
         if (transitionClassName || transitionStyle) {
           // reflow
@@ -81,6 +89,8 @@ export const UnmountAnimationClone: FunctionComponent<UnmountAnimationCloneProps
           }
 
           clone.remove();
+
+          onUnmountRemove?.();
         }
       };
       // eslint-disable-next-line react-hooks/exhaustive-deps
