@@ -1,13 +1,14 @@
 {
-  "extends": "@mufan/code-boilerplates/typescript",
+  "boilerplate": "@mufan/code-boilerplates/typescript",
   "options": {
     "name": "unmount-animation-clone",
     "description": "A simple utility component that clones the DOM element for animation before it unmounts.",
     "license": "MIT",
     "author": "vilicvane",
-    "tsProjects": [
+    "projects": [
       {
-        "name": "library"
+        "name": "library",
+        "module": ["cjs", "esm"]
       }
     ]
   }

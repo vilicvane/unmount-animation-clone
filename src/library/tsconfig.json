@@ -3,7 +3,6 @@
   "compilerOptions": {
     "composite": true,
     "lib": ["esnext", "dom"],
-    "importHelpers": false,
-    "outDir": "../../bld/library"
+    "outDir": "../../bld/library/cjs"
   }
 }
