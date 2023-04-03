@@ -82,7 +82,12 @@ export const UnmountAnimationClone: FunctionComponent<
       }
 
       function onEnd(event: Event): void {
-        if (event.target !== clone) {
+        const target = event.target as HTMLElement;
+
+        if (
+          target !== clone &&
+          !target.classList.contains('unmount-transition-target')
+        ) {
           return;
         }
 
