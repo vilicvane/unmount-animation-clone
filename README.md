@@ -94,7 +94,7 @@ npm install
 npm test
 ```
 
-The DOM regression tests live in `src/library/*.test.ts` and use Jest with React 19.1. `npm test` builds them into `bld/library` before running Jest. The same tests can run against an installed package with React 18.2 to verify compatibility.
+The DOM regression tests live in `src/library/*.test.ts` and use Jest with React 19.1. `npm test` builds them into `bld/library` before running Jest. For React 18 compatibility checks, run the same tests with React 18.3.1, which provides `act` directly from `react`.
 
 ## License
 

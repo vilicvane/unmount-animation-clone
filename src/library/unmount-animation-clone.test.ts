@@ -1,14 +1,12 @@
 /** @jest-environment jsdom */
 
 import * as React from 'react';
+import {act} from 'react';
 import type {Root} from 'react-dom/client';
 import {createRoot} from 'react-dom/client';
-import {act as legacyAct} from 'react-dom/test-utils';
 
 import type {UnmountAnimationCloneProps} from 'unmount-animation-clone';
 import {UnmountAnimationClone} from 'unmount-animation-clone';
-
-const act = React.act ?? legacyAct;
 
 let container: HTMLDivElement;
 let root: Root;
