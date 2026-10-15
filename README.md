@@ -8,6 +8,8 @@ A simple utility component that clones the DOM element for animation before it u
 yarn add unmount-animation-clone
 ```
 
+Supports React 18.2 and React 19, including Strict Mode and React 19 ref cleanup.
+
 ## Usage
 
 [Live Demo](https://codesandbox.io/s/unmount-animation-clone-ich71)
@@ -77,9 +79,22 @@ function App() {
 
 - `className` class name adds to the DOM element clone for unmount animation, defaults to `unmount`.
 
-> `UnmountAnimationClone` requires one and only one React element as child. If the child is not a DOM element, make sure `forwardRef` is used to forward the ref to the outermost DOM element.
+> `UnmountAnimationClone` requires one and only one React element as child. If the child is not a DOM element, forward its ref to the outermost DOM element (`forwardRef` in React 18, or a ref prop in React 19).
 
-> `UnmountAnimationClone` relies on `animationend` event to remove the animated clone, so unmount animation is required.
+> Keep the animated element's DOM parent mounted until its exit finishes. The clone stays in that parent; this component does not create a portal or keep an unmounted parent alive.
+
+> The clone is inserted before React removes the original element. Exit callbacks and transition styles run after that commit, so Strict Mode's effect replay does not trigger an exit.
+
+> The clone is removed on `animationend`, `transitionend`, or cancellation. Events must come from the clone itself or a descendant with the `unmount-transition-target` class. An exit animation is required; for reduced motion, keep the animation name and set its duration to `0s` so it still emits an end event. Set `persist` to keep the clone for debugging.
+
+## Development
+
+```sh
+yarn install
+yarn test
+```
+
+The DOM regression tests use React 19.1. The same tests can run against an installed package with React 18.2 to verify compatibility.
 
 ## License
 

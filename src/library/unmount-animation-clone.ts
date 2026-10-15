@@ -1,13 +1,7 @@
-import composeRefs from '@seznam/compose-react-refs';
 import type {CSSProperties, FunctionComponent, ReactElement} from 'react';
-import {
-  Children,
-  cloneElement,
-  isValidElement,
-  useEffect,
-  useLayoutEffect,
-  useRef,
-} from 'react';
+import {Children, cloneElement, useLayoutEffect, useRef} from 'react';
+
+import {getElementRef, useComposedRef} from './@refs';
 
 export interface UnmountAnimationCloneProps {
   /**
@@ -42,14 +36,22 @@ export const UnmountAnimationClone: FunctionComponent<
   onUnmountRemove,
   children,
 }) => {
-  // eslint-disable-next-line no-null/no-null
   const ref = useRef<HTMLElement>(null);
+  const pendingCloneRef = useRef<HTMLElement | undefined>(undefined);
 
   useLayoutEffect(() => {
+    // Remove StrictMode's replay clone before parent layout effects run.
+    pendingCloneRef.current?.remove();
+    pendingCloneRef.current = undefined;
+
     return () => {
       // eslint-disable-next-line react-hooks/exhaustive-deps
-      const origin = ref.current!;
-      const parent = origin.parentElement!;
+      const origin = ref.current;
+      const parent = origin?.parentElement;
+
+      if (!origin || !parent) {
+        return;
+      }
 
       const clone = origin.cloneNode(true) as HTMLElement;
 
@@ -60,26 +62,39 @@ export const UnmountAnimationClone: FunctionComponent<
       }
 
       parent.insertBefore(clone, origin);
+      pendingCloneRef.current = clone;
 
-      onUnmountClone?.(clone);
-
-      if (transitionClassName || transitionStyle) {
-        // reflow
-        void clone.offsetHeight;
-
-        if (transitionClassName) {
-          clone.classList.add(transitionClassName);
+      // Keep the clone in place before React removes the original, but wait for
+      // the commit to finish before starting a real exit and its callbacks.
+      queueMicrotask(() => {
+        if (pendingCloneRef.current !== clone) {
+          return;
         }
 
-        if (transitionStyle) {
-          assignStyle(clone, transitionStyle);
-        }
-      }
+        pendingCloneRef.current = undefined;
 
-      if (!persist) {
-        clone.addEventListener('animationend', onEnd);
-        clone.addEventListener('transitionend', onEnd);
-      }
+        if (!persist) {
+          clone.addEventListener('animationend', onEnd);
+          clone.addEventListener('animationcancel', onEnd);
+          clone.addEventListener('transitionend', onEnd);
+          clone.addEventListener('transitioncancel', onEnd);
+        }
+
+        onUnmountClone?.(clone);
+
+        if (transitionClassName || transitionStyle) {
+          // reflow
+          void clone.offsetHeight;
+
+          if (transitionClassName) {
+            clone.classList.add(transitionClassName);
+          }
+
+          if (transitionStyle) {
+            assignStyle(clone, transitionStyle);
+          }
+        }
+      });
 
       function onEnd(event: Event): void {
         const target = event.target as HTMLElement;
@@ -91,35 +106,32 @@ export const UnmountAnimationClone: FunctionComponent<
           return;
         }
 
-        clone.remove();
+        clone.removeEventListener('animationend', onEnd);
+        clone.removeEventListener('animationcancel', onEnd);
+        clone.removeEventListener('transitionend', onEnd);
+        clone.removeEventListener('transitioncancel', onEnd);
 
+        clone.remove();
         onUnmountRemove?.();
       }
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const renderCountRef = useRef(0);
+  const classNameRef = useRef(className);
 
-  useEffect(() => {
-    renderCountRef.current++;
-
-    if (renderCountRef.current > 1) {
-      throw new Error(
-        'Property `className` of `UnmountAnimationClone` must not mutate during the lifecycle',
-      );
-    }
-  }, [className]);
+  if (className !== classNameRef.current) {
+    throw new Error(
+      'Property `className` of `UnmountAnimationClone` must not mutate during the lifecycle',
+    );
+  }
 
   const child = Children.only(children);
-
-  if (!isValidElement(child)) {
-    throw new Error('Expecting a React element');
-  }
+  const composedRef = useComposedRef(ref, getElementRef<HTMLElement>(child));
 
   // eslint-disable-next-line @mufan/no-object-literal-type-assertion
   return cloneElement(child, {
-    ref: composeRefs((child as any).ref, ref),
+    ref: composedRef,
   } as object);
 };
 
