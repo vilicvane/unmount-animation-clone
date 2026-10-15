@@ -1,14 +1,17 @@
 {
+  "$schema": "boilerplate.schema.json",
   "boilerplate": "@mufan/code-boilerplates/typescript",
   "options": {
     "name": "unmount-animation-clone",
     "description": "A simple utility component that clones the DOM element for animation before it unmounts.",
     "license": "MIT",
     "author": "vilicvane",
+    "defaultBranch": "master",
+    "packageManager": "npm",
     "projects": [
       {
         "name": "library",
-        "module": ["cjs", "esm"]
+        "test": true
       }
     ]
   }

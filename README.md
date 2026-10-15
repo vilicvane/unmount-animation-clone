@@ -4,8 +4,8 @@ A simple utility component that clones the DOM element for animation before it u
 
 ## Installation
 
-```ts
-yarn add unmount-animation-clone
+```sh
+npm install unmount-animation-clone
 ```
 
 Supports React 18.2 and React 19, including Strict Mode and React 19 ref cleanup.
@@ -90,11 +90,11 @@ function App() {
 ## Development
 
 ```sh
-yarn install
-yarn test
+npm install
+npm test
 ```
 
-The DOM regression tests use React 19.1. The same tests can run against an installed package with React 18.2 to verify compatibility.
+The DOM regression tests live in `src/library/*.test.ts` and use Jest with React 19.1. `npm test` builds them into `bld/library` before running Jest. The same tests can run against an installed package with React 18.2 to verify compatibility.
 
 ## License
 

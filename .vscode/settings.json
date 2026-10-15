@@ -3,15 +3,19 @@
   "editor.insertSpaces": true,
   "editor.formatOnSave": true,
   "editor.codeActionsOnSave": {
-    "source.fixAll.eslint": true
+    "source.fixAll.eslint": "explicit"
   },
   "editor.defaultFormatter": "esbenp.prettier-vscode",
   "editor.rulers": [80],
+  "files.associations": {
+    "boilerplate.json": "jsonc"
+  },
   "files.eol": "\n",
   "files.insertFinalNewline": true,
   "files.trimTrailingWhitespace": true,
-  "typescript.tsdk": "node_modules/typescript/lib",
-  "eslint.workingDirectories": [".", "src/library"],
+  "js/ts.preferences.importModuleSpecifier": "project-relative",
+  "js/ts.preferences.importModuleSpecifierEnding": "js",
+  "js/ts.tsdk.path": "node_modules/typescript/lib",
   "eslint.validate": [
     "javascript",
     "javascriptreact",

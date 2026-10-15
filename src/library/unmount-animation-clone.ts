@@ -1,9 +1,9 @@
 import type {CSSProperties, FunctionComponent, ReactElement} from 'react';
 import {Children, cloneElement, useLayoutEffect, useRef} from 'react';
 
-import {getElementRef, useComposedRef} from './@refs';
+import {getElementRef, useComposedRef} from './@refs.js';
 
-export interface UnmountAnimationCloneProps {
+export type UnmountAnimationCloneProps = {
   /**
    * Class name that adds to the DOM element clone for unmount animation.
    */
@@ -22,7 +22,7 @@ export interface UnmountAnimationCloneProps {
   onUnmountClone?(clone: HTMLElement): void;
   onUnmountRemove?(): void;
   children: ReactElement;
-}
+};
 
 export const UnmountAnimationClone: FunctionComponent<
   UnmountAnimationCloneProps
@@ -129,7 +129,6 @@ export const UnmountAnimationClone: FunctionComponent<
   const child = Children.only(children);
   const composedRef = useComposedRef(ref, getElementRef<HTMLElement>(child));
 
-  // eslint-disable-next-line @mufan/no-object-literal-type-assertion
   return cloneElement(child, {
     ref: composedRef,
   } as object);

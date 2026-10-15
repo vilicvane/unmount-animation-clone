@@ -6,8 +6,7 @@ export function getElementRef<T>(element: ReactElement): Ref<T> | undefined {
   // descriptors avoids invoking either version's deprecated ref getter.
   return (Object.getOwnPropertyDescriptor(element.props, 'ref')?.value ??
     Object.getOwnPropertyDescriptor(element, 'ref')?.value) as
-    | Ref<T>
-    | undefined;
+    Ref<T> | undefined;
 }
 
 export function useComposedRef<T>(

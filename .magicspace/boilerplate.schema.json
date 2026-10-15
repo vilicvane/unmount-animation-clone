@@ -1,0 +1,516 @@
+{
+  "$ref": "#/$defs/type-32",
+  "$defs": {
+    "type-1": {
+      "anyOf": [
+        {
+          "type": "string",
+          "const": "Apache-2.0"
+        },
+        {
+          "type": "string",
+          "const": "BSD-2-Clause"
+        },
+        {
+          "type": "string",
+          "const": "BSD-3-Clause"
+        },
+        {
+          "type": "string",
+          "const": "ISC"
+        },
+        {
+          "type": "string",
+          "const": "MIT"
+        },
+        {
+          "type": "string",
+          "const": "MPL-2.0"
+        },
+        {
+          "type": "string",
+          "const": "Unlicense"
+        },
+        {
+          "type": "string",
+          "const": "WTFPL"
+        }
+      ]
+    },
+    "type-2": {
+      "type": "object",
+      "required": [],
+      "properties": {
+        "npm": {
+          "type": "boolean"
+        },
+        "repo": {
+          "type": "boolean"
+        },
+        "coverage": {
+          "type": "boolean"
+        },
+        "license": {
+          "type": "boolean"
+        },
+        "discord": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": false
+    },
+    "type-3": {
+      "anyOf": [
+        {
+          "type": "string",
+          "const": "pnpm"
+        },
+        {
+          "type": "string",
+          "const": "yarn"
+        },
+        {
+          "type": "string",
+          "const": "npm"
+        }
+      ]
+    },
+    "type-4": {
+      "anyOf": [
+        {
+          "type": "string",
+          "const": "library"
+        },
+        {
+          "type": "string",
+          "const": "program"
+        },
+        {
+          "type": "string",
+          "const": "script"
+        }
+      ]
+    },
+    "type-5": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/type-4"
+        }
+      ],
+      "description": "Defaults to 'library' if project name includes 'library', otherwise 'program'."
+    },
+    "type-6": {
+      "type": "object",
+      "required": [
+        "subpath",
+        "module"
+      ],
+      "properties": {
+        "subpath": {
+          "type": "string",
+          "description": "Submodule should be \".\" or relative path that starts with \"./\".",
+          "pattern": "^\\.(?:\\/.+)?$"
+        },
+        "module": {
+          "type": "string",
+          "description": "Module should be the source file name without `.ts` extension relative to the source directory, e.g. \"index\"."
+        }
+      },
+      "additionalProperties": false
+    },
+    "type-7": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/type-6"
+        },
+        {
+          "type": "string"
+        },
+        {
+          "type": "boolean"
+        }
+      ]
+    },
+    "type-8": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/type-7"
+        }
+      ],
+      "description": "Whether generate `exports` field in package.json"
+    },
+    "type-9": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "boolean",
+          "const": false
+        }
+      ]
+    },
+    "type-10": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/type-9"
+        }
+      ],
+      "description": "Extra parent directory, defaults to false."
+    },
+    "type-11": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "boolean",
+          "const": false
+        }
+      ]
+    },
+    "type-12": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/type-11"
+        }
+      ],
+      "description": "Source directory, defaults to false if the project type is 'script', otherwise 'src'."
+    },
+    "type-13": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "boolean",
+          "const": false
+        }
+      ]
+    },
+    "type-14": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/type-13"
+        }
+      ],
+      "description": "TypeScript project directory under source directory, defaults to `name` option."
+    },
+    "type-15": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "type-16": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/type-15"
+        },
+        {
+          "type": "boolean"
+        }
+      ]
+    },
+    "type-17": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/type-16"
+        }
+      ],
+      "description": "Whether to add entrances file(s) and related package/configuration.If true, defaults to ['@entrances.ts']."
+    },
+    "type-18": {
+      "type": "object",
+      "required": [
+        "package",
+        "project"
+      ],
+      "properties": {
+        "package": {
+          "type": "string"
+        },
+        "project": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": false
+    },
+    "type-19": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "$ref": "#/$defs/type-18"
+        }
+      ]
+    },
+    "type-20": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/type-19"
+      }
+    },
+    "type-21": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/type-20"
+        }
+      ],
+      "description": "References to other TypeScript projects, corresponded to `references` field in 'tsconfig.json'"
+    },
+    "type-22": {
+      "type": "object",
+      "required": [],
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "TypeScript project name, defaults to 'program'."
+        },
+        "type": {
+          "$ref": "#/$defs/type-5"
+        },
+        "exports": {
+          "$ref": "#/$defs/type-8"
+        },
+        "exportSourceAs": {
+          "type": "string",
+          "description": "Export source with specific condition name, e.g.: 'vite'."
+        },
+        "dev": {
+          "type": "boolean",
+          "description": "Whether this TypeScript project is a development-time project, defaults to true if the project name includes 'test' or project type is 'script', otherwise false."
+        },
+        "parentDir": {
+          "$ref": "#/$defs/type-10"
+        },
+        "src": {
+          "$ref": "#/$defs/type-12"
+        },
+        "dir": {
+          "$ref": "#/$defs/type-14"
+        },
+        "noEmit": {
+          "type": "boolean",
+          "description": "Whether this project does not emit build artifact, defaults to true if `src` is false, otherwise false."
+        },
+        "test": {
+          "type": "boolean",
+          "description": "Whether this project is a test project or includes tests, defaults to true if `name` includes 'test', otherwise false."
+        },
+        "entrances": {
+          "$ref": "#/$defs/type-17"
+        },
+        "references": {
+          "$ref": "#/$defs/type-21"
+        }
+      },
+      "additionalProperties": false
+    },
+    "type-23": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/type-22"
+      }
+    },
+    "type-24": {
+      "type": "object",
+      "required": [
+        "name"
+      ],
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "dir": {
+          "type": "string",
+          "description": "Directory name of this package, defaults to package name (\"@*/\" removed if any)."
+        },
+        "badges": {
+          "$ref": "#/$defs/type-2"
+        },
+        "projects": {
+          "$ref": "#/$defs/type-23"
+        }
+      },
+      "additionalProperties": false
+    },
+    "type-25": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/type-24"
+      }
+    },
+    "type-26": {
+      "anyOf": [
+        {
+          "type": "string",
+          "const": "as-needed"
+        },
+        {
+          "type": "string",
+          "const": "consistent"
+        },
+        {
+          "type": "string",
+          "const": "preserve"
+        }
+      ]
+    },
+    "type-27": {
+      "anyOf": [
+        {
+          "type": "string",
+          "const": "es5"
+        },
+        {
+          "type": "string",
+          "const": "none"
+        },
+        {
+          "type": "string",
+          "const": "all"
+        }
+      ]
+    },
+    "type-28": {
+      "anyOf": [
+        {
+          "type": "string",
+          "const": "always"
+        },
+        {
+          "type": "string",
+          "const": "avoid"
+        }
+      ]
+    },
+    "type-29": {
+      "type": "object",
+      "required": [
+        "printWidth",
+        "tabWidth",
+        "useTabs",
+        "semi",
+        "singleQuote",
+        "quoteProps",
+        "jsxSingleQuote",
+        "trailingComma",
+        "bracketSpacing",
+        "bracketSameLine",
+        "arrowParens"
+      ],
+      "properties": {
+        "printWidth": {
+          "type": "number"
+        },
+        "tabWidth": {
+          "type": "number"
+        },
+        "useTabs": {
+          "type": "boolean"
+        },
+        "semi": {
+          "type": "boolean"
+        },
+        "singleQuote": {
+          "type": "boolean"
+        },
+        "quoteProps": {
+          "$ref": "#/$defs/type-26"
+        },
+        "jsxSingleQuote": {
+          "type": "boolean"
+        },
+        "trailingComma": {
+          "$ref": "#/$defs/type-27"
+        },
+        "bracketSpacing": {
+          "type": "boolean"
+        },
+        "bracketSameLine": {
+          "type": "boolean"
+        },
+        "arrowParens": {
+          "$ref": "#/$defs/type-28"
+        }
+      },
+      "additionalProperties": false
+    },
+    "type-30": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/type-22"
+      }
+    },
+    "type-31": {
+      "type": "object",
+      "required": [
+        "name",
+        "defaultBranch",
+        "packageManager"
+      ],
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        },
+        "repository": {
+          "type": "string"
+        },
+        "license": {
+          "$ref": "#/$defs/type-1"
+        },
+        "author": {
+          "type": "string"
+        },
+        "badges": {
+          "$ref": "#/$defs/type-2"
+        },
+        "defaultBranch": {
+          "type": "string"
+        },
+        "packageManager": {
+          "$ref": "#/$defs/type-3"
+        },
+        "packagesDir": {
+          "type": "string",
+          "description": "Name of the packages directory, defaults to \"packages\"."
+        },
+        "packages": {
+          "$ref": "#/$defs/type-25"
+        },
+        "prettier": {
+          "$ref": "#/$defs/type-29"
+        },
+        "projects": {
+          "$ref": "#/$defs/type-30"
+        }
+      },
+      "additionalProperties": false
+    },
+    "type-32": {
+      "type": "object",
+      "required": [
+        "$schema",
+        "boilerplate",
+        "options"
+      ],
+      "properties": {
+        "$schema": {
+          "type": "string"
+        },
+        "boilerplate": {
+          "type": "string"
+        },
+        "options": {
+          "$ref": "#/$defs/type-31"
+        }
+      },
+      "additionalProperties": false
+    }
+  }
+}

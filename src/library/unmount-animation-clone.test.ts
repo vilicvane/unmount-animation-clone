@@ -1,40 +1,43 @@
-const assert = require('node:assert/strict');
-const {afterEach, beforeEach, test} = require('node:test');
-const {JSDOM} = require('jsdom');
-const React = require('react');
-const {createRoot} = require('react-dom/client');
-const {UnmountAnimationClone} = require('unmount-animation-clone');
+/** @jest-environment jsdom */
 
-const act = React.act || require('react-dom/test-utils').act;
+import * as React from 'react';
+import type {Root} from 'react-dom/client';
+import {createRoot} from 'react-dom/client';
+import {act as legacyAct} from 'react-dom/test-utils';
 
-let dom;
-let container;
-let root;
+import type {UnmountAnimationCloneProps} from 'unmount-animation-clone';
+import {UnmountAnimationClone} from 'unmount-animation-clone';
+
+const act = React.act ?? legacyAct;
+
+let container: HTMLDivElement;
+let root: Root;
 
 beforeEach(() => {
-  dom = new JSDOM('<!doctype html><div id="root"></div>');
-  global.window = dom.window;
-  global.document = dom.window.document;
-  global.IS_REACT_ACT_ENVIRONMENT = true;
-  container = dom.window.document.getElementById('root');
+  Object.assign(globalThis, {IS_REACT_ACT_ENVIRONMENT: true});
+  container = document.createElement('div');
+  document.body.append(container);
   root = createRoot(container);
 });
 
 afterEach(async () => {
   await act(() => root.unmount());
-  dom.window.close();
-  delete global.window;
-  delete global.document;
-  delete global.IS_REACT_ACT_ENVIRONMENT;
+  container.remove();
 });
 
-function renderClone(props = {}, child = React.createElement('span', {}, '3')) {
-  return React.createElement(UnmountAnimationClone, props, child);
+function renderClone(
+  props: Omit<UnmountAnimationCloneProps, 'children'> = {},
+  child: React.ReactElement = React.createElement('span', {}, '3'),
+): React.ReactElement {
+  return React.createElement(UnmountAnimationClone, {
+    ...props,
+    children: child,
+  });
 }
 
 test('StrictMode does not create a clone until the actual unmount', async () => {
-  const clones = [];
-  const render = shown =>
+  const clones: HTMLElement[] = [];
+  const render = (shown: boolean): React.ReactElement =>
     React.createElement(
       React.StrictMode,
       {},
@@ -49,25 +52,23 @@ test('StrictMode does not create a clone until the actual unmount', async () => 
     );
 
   await act(() => root.render(render(true)));
-  assert.equal(container.querySelectorAll('.unmount').length, 0);
-  assert.equal(clones.length, 0);
+  expect(container.querySelectorAll('.unmount')).toHaveLength(0);
+  expect(clones).toHaveLength(0);
 
   await act(() => root.render(render(false)));
-  assert.equal(container.querySelectorAll('.unmount').length, 1);
-  assert.equal(clones.length, 1);
-  assert.equal(container.textContent, '3remaining');
+  expect(container.querySelectorAll('.unmount')).toHaveLength(1);
+  expect(clones).toHaveLength(1);
+  expect(container.textContent).toBe('3remaining');
 
-  clones[0].dispatchEvent(
-    new dom.window.Event('animationend', {bubbles: true}),
-  );
-  assert.equal(container.textContent, 'remaining');
+  clones[0].dispatchEvent(new Event('animationend', {bubbles: true}));
+  expect(container.textContent).toBe('remaining');
 });
 
 test('StrictMode replay is cancelled when a layout effect immediately unmounts the child', async () => {
-  const clones = [];
-  const layoutCloneCounts = [];
+  const clones: HTMLElement[] = [];
+  const layoutCloneCounts: number[] = [];
 
-  function HideAfterLayout() {
+  function HideAfterLayout(): React.ReactElement {
     const [shown, setShown] = React.useState(true);
 
     React.useLayoutEffect(() => {
@@ -91,25 +92,25 @@ test('StrictMode replay is cancelled when a layout effect immediately unmounts t
       ),
     ),
   );
-  assert.deepEqual(layoutCloneCounts, [0, 0]);
-  assert.equal(clones.length, 1);
-  assert.equal(container.querySelectorAll('.unmount').length, 1);
+  expect(layoutCloneCounts).toEqual([0, 0]);
+  expect(clones).toHaveLength(1);
+  expect(container.querySelectorAll('.unmount')).toHaveLength(1);
 });
 
 test('child object refs remain intact without deprecated ref access', async () => {
-  const ref = React.createRef();
-  const errors = [];
+  const ref = React.createRef<HTMLSpanElement>();
+  const errors: string[] = [];
   const originalError = console.error;
-  console.error = (...args) => errors.push(args.join(' '));
+  console.error = (...args: unknown[]) => errors.push(args.join(' '));
 
   try {
     await act(() =>
       root.render(renderClone({}, React.createElement('span', {ref}, '3'))),
     );
-    assert.equal(ref.current, container.firstElementChild);
+    expect(ref.current).toBe(container.firstElementChild);
     await act(() => root.render(null));
-    assert.equal(ref.current, null);
-    assert.deepEqual(errors, []);
+    expect(ref.current).toBeNull();
+    expect(errors).toEqual([]);
   } finally {
     console.error = originalError;
   }
@@ -121,37 +122,42 @@ test('changing className still reports an invalid lifecycle mutation', async () 
 
   try {
     await act(() => root.render(renderClone({className: 'leave'})));
-    await assert.rejects(async () => {
+    await expect(async () => {
       await act(() => root.render(renderClone({className: 'other'})));
-    }, /Property `className` of `UnmountAnimationClone` must not mutate/);
+    }).rejects.toThrow(
+      'Property `className` of `UnmountAnimationClone` must not mutate',
+    );
   } finally {
     console.error = originalError;
   }
 });
 
-test(
+(React.version.startsWith('19.') ? test : test.skip)(
   'React 19 child ref cleanup is forwarded',
-  {skip: !React.version.startsWith('19.')},
   async () => {
     let attached = 0;
     let cleaned = 0;
-    const ref = node => {
-      assert.ok(node);
+    const ref: React.RefCallback<HTMLSpanElement> = node => {
+      expect(node).not.toBeNull();
       attached++;
-      return () => cleaned++;
+
+      return () => {
+        cleaned++;
+      };
     };
 
     await act(() =>
       root.render(renderClone({}, React.createElement('span', {ref}))),
     );
     await act(() => root.render(null));
-    assert.equal(attached, 1);
-    assert.equal(cleaned, 1);
+    expect(attached).toBe(1);
+    expect(cleaned).toBe(1);
   },
 );
 
 test('only the clone or a designated descendant can finish the exit', async () => {
   let removed = 0;
+
   await act(() =>
     root.render(
       renderClone(
@@ -171,27 +177,31 @@ test('only the clone or a designated descendant can finish the exit', async () =
   );
   await act(() => root.render(null));
 
-  const clone = container.querySelector('.unmount');
-  clone.firstElementChild.dispatchEvent(
-    new dom.window.Event('animationend', {bubbles: true}),
+  const clone = container.querySelector<HTMLElement>('.unmount')!;
+
+  clone.firstElementChild!.dispatchEvent(
+    new Event('animationend', {bubbles: true}),
   );
-  assert.equal(clone.isConnected, true);
-  clone.lastElementChild.dispatchEvent(
-    new dom.window.Event('transitionend', {bubbles: true}),
+  expect(clone.isConnected).toBe(true);
+  clone.lastElementChild!.dispatchEvent(
+    new Event('transitionend', {bubbles: true}),
   );
-  clone.dispatchEvent(new dom.window.Event('animationend'));
-  assert.equal(clone.isConnected, false);
-  assert.equal(removed, 1);
+  clone.dispatchEvent(new Event('animationend'));
+  expect(clone.isConnected).toBe(false);
+  expect(removed).toBe(1);
 });
 
 test('a cancelled exit removes the clone', async () => {
   let removed = 0;
+
   await act(() => root.render(renderClone({onUnmountRemove: () => removed++})));
   await act(() => root.render(null));
-  const clone = container.querySelector('.unmount');
-  clone.dispatchEvent(new dom.window.Event('animationcancel'));
-  assert.equal(clone.isConnected, false);
-  assert.equal(removed, 1);
+
+  const clone = container.querySelector<HTMLElement>('.unmount')!;
+
+  clone.dispatchEvent(new Event('animationcancel'));
+  expect(clone.isConnected).toBe(false);
+  expect(removed).toBe(1);
 });
 
 test('transition styles and persistent clones keep the existing API', async () => {
@@ -206,8 +216,10 @@ test('transition styles and persistent clones keep the existing API', async () =
     ),
   );
   await act(() => root.render(null));
-  const clone = container.querySelector('.unmount.leave');
-  assert.equal(clone.style.opacity, '0');
-  clone.dispatchEvent(new dom.window.Event('transitionend'));
-  assert.equal(clone.isConnected, true);
+
+  const clone = container.querySelector<HTMLElement>('.unmount.leave')!;
+
+  expect(clone.style.opacity).toBe('0');
+  clone.dispatchEvent(new Event('transitionend'));
+  expect(clone.isConnected).toBe(true);
 });

@@ -1,8 +1,10 @@
 {
-  "extends": "@mufan/code/tsconfig.json",
+  "extends": "../../tsconfig.base.json",
   "compilerOptions": {
     "composite": true,
-    "lib": ["esnext", "dom"],
-    "outDir": "../../bld/library/cjs"
+    "lib": ["ESNext", "DOM"],
+    "types": ["jest"],
+    "rootDir": ".",
+    "outDir": "../../bld/library"
   }
 }

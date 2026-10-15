@@ -1,1 +1,1 @@
-export * from './unmount-animation-clone';
+export * from './unmount-animation-clone.js';
